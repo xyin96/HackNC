@@ -41,6 +41,8 @@ public class MainFragment extends Fragment {
 								.addToBackStack(null).commit();
 						break;
 					case 1:
+						fm.beginTransaction().replace(R.id.container, new ClientFragment())
+								.addToBackStack(null).commit();
 						break;
 				}
 			}

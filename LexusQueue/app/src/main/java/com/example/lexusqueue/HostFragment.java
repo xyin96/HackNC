@@ -27,8 +27,6 @@ public class HostFragment extends Fragment {
 		View view = inflater.inflate(R.layout.fragment_host_list, container, false);
 
 		ArrayList<String> data = new ArrayList<String>();
-		for(int i = 0; i < 20; i++)
-			data.add("test");
 		ListView list = (ListView) view.findViewById(R.id.list);
 		ImageButton play = (ImageButton) view.findViewById(R.id.playButton);
 		ImageButton back = (ImageButton) view.findViewById(R.id.backButton);
