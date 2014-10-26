@@ -26,13 +26,13 @@ public class HostFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		View view = inflater.inflate(R.layout.fragment_host_list, container, false);
 
-		ArrayList<String> data = new ArrayList<String>();
+		ArrayList<Song> songs = new ArrayList<Song>();
 		ListView list = (ListView) view.findViewById(R.id.list);
 		ImageButton play = (ImageButton) view.findViewById(R.id.playButton);
 		ImageButton back = (ImageButton) view.findViewById(R.id.backButton);
 		ImageButton next = (ImageButton) view.findViewById(R.id.nextButton);
 
-		list.setAdapter(new CardAdapter(data, getActivity()));
+		list.setAdapter(new CardAdapter(songs, getActivity()));
 
 		play.setOnClickListener(new View.OnClickListener() {
 			@Override

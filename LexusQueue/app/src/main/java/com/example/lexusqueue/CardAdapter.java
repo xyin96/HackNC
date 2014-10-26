@@ -10,10 +10,10 @@ import android.widget.TextView;
 import java.util.ArrayList;
 
 public class CardAdapter extends BaseAdapter {
-	private ArrayList<String> data;
+	private ArrayList<?> data;
 	private LayoutInflater inflater;
 
-	public CardAdapter(ArrayList<String> data, Context context){
+	public CardAdapter(ArrayList<?> data, Context context){
 		this.data = data;
 		inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 	}
@@ -40,7 +40,7 @@ public class CardAdapter extends BaseAdapter {
 			vi = inflater.inflate(R.layout.card_button, null);
 
 		TextView text = (TextView) vi.findViewById(R.id.cardText);
-		text.setText(data.get(position));
+		text.setText(data.get(position).toString());
 
 		vi.setTag(position);
 		return vi;
