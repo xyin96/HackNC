@@ -5,7 +5,6 @@
     android:layout_height="match_parent"
     tools:context=".main"
     tools:ignore="MergeRootFrame" >
-<<<<<<< HEAD
 
     <Button
         android:layout_width="wrap_content"
@@ -14,24 +13,4 @@
         android:id="@+id/button"
         android:layout_gravity="center"
         android:onClick="choose"/>
-</FrameLayout>
-=======
-    <TextView
-        android:id="@+id/textView_explanation"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/explanation" />
-    <Button
-        android:id="@+id/pickFile"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="pick"
-        android:layout_below="@+id/textView_explanation"></Button>
-    <Button
-        android:id="@+id/sendBeam"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Beam"
-        android:layout_below="@+id/pickFile"></Button>
-    </RelativeLayout>
->>>>>>> origin/master
+</RelativeLayout>

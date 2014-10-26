@@ -35,12 +35,12 @@ public class Beam extends Activity implements CreateNdefMessageCallback,
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        mInfoText = (TextView) findViewById(R.id.textView_explanation);
+
         // Check for available NFC Adapter
         mNfcAdapter = NfcAdapter.getDefaultAdapter(this);
         if (mNfcAdapter == null) {
-            mInfoText = (TextView) findViewById(R.id.textView_explanation);
-            mInfoText.setText("NFC is not available on this device.");
+            Toast.makeText(getApplicationContext(), "NFC is not available on this device.", Toast.LENGTH_LONG);
+            finish();
         }
         // Register callback to set NDEF message
         mNfcAdapter.setNdefPushMessageCallback(this, this);

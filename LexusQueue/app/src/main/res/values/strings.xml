@@ -4,12 +4,10 @@
     <string name="app_name">LexusQueue</string>
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
-<<<<<<< HEAD
     <string name="title_activity_send_nfc">SendNFC</string>
     <string name="title_activity_android_beam_viewer">AndroidBeamViewer</string>
-=======
     <string name="explanation">NFC stuff</string>
     <string name="title_activity_beam_receiver">BeamReceiverActivity</string>
->>>>>>> origin/master
+    <string name="title_activity_beam_reveiver">BeamReveiver</string>
 
 </resources>

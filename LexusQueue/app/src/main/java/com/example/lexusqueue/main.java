@@ -82,7 +82,7 @@ public class main extends Activity {
     public void choose(View view){
         Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
         intent.addCategory(Intent.CATEGORY_OPENABLE);
-        intent.setType("*/*");
+        intent.setType("audio/mpeg");
         Intent i = Intent.createChooser(intent, "File");
         startActivityForResult(i, 1);
 
@@ -93,7 +93,7 @@ public class main extends Activity {
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (resultCode == RESULT_OK) {
             Uri file = data.getData();
-            \Uri[] mFileUris = new Uri[1];
+            Uri[] mFileUris = new Uri[1];
             Log.i("hello", file.toString());
             //File myFile = new File(file.toString());
             //myFile.setReadable(true, false);
