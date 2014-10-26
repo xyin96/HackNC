@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.database.Cursor;
+import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -31,6 +32,7 @@ public class HostFragment extends Fragment {
 	private boolean musicBound = false;
 	private CardAdapter adapter;
 	private ArrayList<Song> songs;
+    protected Uri[] fUri = new Uri[1];
 	private MusicService musicSrv;
 
 	public HostFragment() {
@@ -157,41 +159,74 @@ public class HostFragment extends Fragment {
 			switch(event){
 				case FileObserver.MOVED_TO:
 					File f = new File(file+path);
-					if(!f.toString().substring(f.toString().length()-4).equals(".mp3"))
-						f.renameTo(new File(file+path+".mp3"));
+					if(!f.toString().substring(f.toString().length()-4).equals(".mp3")) {
+                        f.renameTo(new File(file + path + ".mp3"));
+                    }
 					Log.d("test", "@" + f);
-					Uri uri = MediaStore.Audio.Media.getContentUriForPath(f.toString());
-					uri = Uri.fromFile(f);
-					Log.d("test", "#" + uri.toString());
-					Cursor cursor = getActivity().getContentResolver()
-							.query(uri, null, null, null, null, null);
-					Log.d("test", "!" + cursor.toString());
-					if(cursor.moveToFirst()){
-						int titleColumn = cursor.getColumnIndex
-								(android.provider.MediaStore.Audio.Media.TITLE);
-						int idColumn = cursor.getColumnIndex
-								(android.provider.MediaStore.Audio.Media._ID);
-						int artistColumn = cursor.getColumnIndex
-								(android.provider.MediaStore.Audio.Media.ARTIST);
-						do {
-							long id = cursor.getLong(idColumn);
-							String title = cursor.getString(titleColumn);
-							String artist = cursor.getString(artistColumn);
-							songs.add(new Song(id, title, artist));
-						} while (cursor.moveToNext());
-					}
-					Handler mainHandler = new Handler(Looper.getMainLooper());
-					Runnable myRunnable = new Runnable() {
-						@Override
-						public void run() {
-							adapter.notifyDataSetChanged();
 
-						}
-					};
-					mainHandler.post(myRunnable);
+
+                    final String filePathThis = file + path;
+                    Log.i("test",path);
+
+                    MediaScannerConnection.MediaScannerConnectionClient mediaScannerClient = new
+                            MediaScannerConnection.MediaScannerConnectionClient() {
+                                private MediaScannerConnection msc = null;
+                                {
+                                    msc = new MediaScannerConnection(getActivity().getApplicationContext(), this);
+                                    msc.connect();
+                                }
+
+                                public void onMediaScannerConnected(){
+                                    msc.scanFile(filePathThis, null);
+                                }
+
+
+                                public void onScanCompleted(String path, Uri uri) {
+                                    Log.d("test", "#" + uri.toString());
+
+                                    Uri uri2 = Uri.parse(uri.toString());
+                                    fUri[0] = uri2;
+                                    Log.d("test", "$" + uri2.toString());
+                                    msc.disconnect();
+                                    callback();
+                                }
+                            };
+
+
 					break;
 							}
 		}
+
+        void callback(){
+            //Uri uri = Uri.fromFile(f);
+            //Log.d("test", "#" + uri.toString());
+            Log.d("test", "!" + fUri[0].toString());
+            Cursor cursor = getActivity().getContentResolver()
+                    .query(fUri[0], null, null, null, null, null);
+            if(cursor.moveToFirst()){
+                int titleColumn = cursor.getColumnIndex
+                        (android.provider.MediaStore.Audio.Media.TITLE);
+                int idColumn = cursor.getColumnIndex
+                        (android.provider.MediaStore.Audio.Media._ID);
+                int artistColumn = cursor.getColumnIndex
+                        (android.provider.MediaStore.Audio.Media.ARTIST);
+                do {
+                    long id = cursor.getLong(idColumn);
+                    String title = cursor.getString(titleColumn);
+                    String artist = cursor.getString(artistColumn);
+                    songs.add(new Song(id, title, artist));
+                } while (cursor.moveToNext());
+            }
+            Handler mainHandler = new Handler(Looper.getMainLooper());
+            Runnable myRunnable = new Runnable() {
+                @Override
+                public void run() {
+                    adapter.notifyDataSetChanged();
+
+                }
+            };
+            mainHandler.post(myRunnable);
+        }
 
 		public void close(){
 			super.finalize();
