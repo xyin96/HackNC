@@ -33,7 +33,7 @@ public class main extends Activity {
         setContentView(R.layout.activity_main);
 
 		FragmentManager fm = getFragmentManager();
-		fm.beginTransaction().replace(R.id.container, new HostFragment()).commit();
+		fm.beginTransaction().replace(R.id.container, new MainFragment()).commit();
 
 
 /*

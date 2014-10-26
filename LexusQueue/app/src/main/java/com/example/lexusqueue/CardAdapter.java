@@ -12,7 +12,6 @@ import java.util.ArrayList;
 public class CardAdapter extends BaseAdapter {
 	private ArrayList<String> data;
 	private LayoutInflater inflater;
-	private Context context;
 
 	public CardAdapter(ArrayList<String> data, Context context){
 		this.data = data;
