@@ -48,6 +48,16 @@
         <ImageButton
             android:layout_width="wrap_content"
             android:layout_height="fill_parent"
+            android:layout_gravity="center"
+            android:src="@drawable/ic_play_button"
+            android:background="@drawable/selectable"
+            android:id="@+id/pauseButton"
+            android:visibility="gone"
+            android:layout_weight="1"/>
+
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="fill_parent"
             android:src="@drawable/ic_step_forward"
             android:background="@drawable/selectable"
             android:id="@+id/nextButton"

@@ -7,6 +7,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Color;
+import android.media.MediaMetadataRetriever;
 import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Bundle;
@@ -21,21 +25,26 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import java.io.File;
 import java.util.ArrayList;
 
-public class HostFragment extends Fragment {
+public class HostFragment extends Fragment implements View.OnClickListener{
 	private Intent playIntent;
 	private boolean musicBound = false;
-	private CardAdapter adapter;
+	protected static CardAdapter adapter;
 	private ArrayList<Song> songs;
     protected Uri[] fUri = new Uri[1];
 	private MusicService musicSrv;
+    ImageButton play, pause;
+    private boolean playing;
 
-	public HostFragment() {
+    public HostFragment() {
 
     }
 
@@ -58,17 +67,39 @@ public class HostFragment extends Fragment {
 		Log.d("test", myFileObserver.toString());
     }
 
+    public void setPlaying(){
+        playing = true;
+        musicSrv.playBtn(play);
+        play.setImageResource(R.drawable.ic_pause);
+    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		View view = inflater.inflate(R.layout.fragment_host_list, container, false);
 
-		songs = new ArrayList<Song>();
+        if(songs == null)
+		    songs = new ArrayList<Song>();
 		ListView list = (ListView) view.findViewById(R.id.list);
-		ImageButton play = (ImageButton) view.findViewById(R.id.playButton);
+		play = (ImageButton) view.findViewById(R.id.playButton);
+        pause = (ImageButton) view.findViewById(R.id.pauseButton);
 		ImageButton back = (ImageButton) view.findViewById(R.id.backButton);
 		ImageButton next = (ImageButton) view.findViewById(R.id.nextButton);
 
-		adapter = new CardAdapter(songs, getActivity());
+		adapter = new CardAdapter(songs, getActivity()){
+            @Override
+            public View getView(int position, View convertView, ViewGroup parent) {
+                View v = null;
+                if(musicSrv.getSong() == position){
+                    v = getActivity().getLayoutInflater().inflate(R.layout.card_button2, null);
+                } else {
+                    v = getActivity().getLayoutInflater().inflate(R.layout.card_button, null);
+                }
+                ((TextView)v.findViewById(R.id.cardText_artist)).setText(songs.get(position).getArtist());
+                ((TextView)v.findViewById(R.id.cardText_title)).setText(songs.get(position).getTitle());
+                ((ImageView)v.findViewById(R.id.album_art_imageview)).setImageBitmap(songs.get(position).getBm());
+                return v;
+            }
+        };
 		list.setAdapter(adapter);
 
 		list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -76,29 +107,16 @@ public class HostFragment extends Fragment {
 			public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
 				musicSrv.setSong(i);
 				musicSrv.playSong();
+                adapter.notifyDataSetChanged();
 			}
 		});
 
-		play.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View view) {
+		play.setOnClickListener(this);
+        pause.setOnClickListener(this);
 
-			}
-		});
+		back.setOnClickListener(this);
 
-		back.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View view) {
-
-			}
-		});
-
-		next.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View view) {
-
-			}
-		});
+		next.setOnClickListener(this);
         return view;
     }
 
@@ -135,7 +153,33 @@ public class HostFragment extends Fragment {
 		}
 	};
 
-	public class PathFileObserver extends FileObserver{
+    @Override
+    public void onClick(View view) {
+        switch(view.getId()){
+            case R.id.playButton:
+                if(playing){
+
+                    playing = false;
+                    musicSrv.pauseSong(play);
+                } else {
+                    playing = true;
+                    musicSrv.playBtn(play);
+                }
+
+
+                break;
+            case R.id.nextButton:
+                musicSrv.nextSong();
+                break;
+            case R.id.backButton:
+                musicSrv.prevSong();
+                break;
+        }
+    }
+
+
+
+    public class PathFileObserver extends FileObserver{
 		static final String TAG="FILEOBSERVER";
 		/**
 		 * should be end with File.separator
@@ -214,7 +258,10 @@ public class HostFragment extends Fragment {
                     long id = cursor.getLong(idColumn);
                     String title = cursor.getString(titleColumn);
                     String artist = cursor.getString(artistColumn);
-                    songs.add(new Song(id, title, artist));
+                    MediaMetadataRetriever m = new MediaMetadataRetriever();
+                    m.setDataSource(getActivity(), fUri[0]);
+                    Bitmap bm = BitmapFactory.decodeByteArray(m.getEmbeddedPicture(), 0, m.getEmbeddedPicture().length);
+                    songs.add(new Song(id, title, artist, bm));
                 } while (cursor.moveToNext());
             }
             Handler mainHandler = new Handler(Looper.getMainLooper());
@@ -222,6 +269,7 @@ public class HostFragment extends Fragment {
                 @Override
                 public void run() {
                     adapter.notifyDataSetChanged();
+                    musicSrv.handleCallback(play);
 
                 }
             };

@@ -11,17 +11,23 @@ import android.os.IBinder;
 import android.os.PowerManager;
 import android.provider.MediaStore;
 import android.util.Log;
+import android.view.View;
+import android.widget.ImageButton;
+import android.widget.SeekBar;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 
 public class MusicService extends Service implements MediaPlayer.OnPreparedListener, MediaPlayer.OnErrorListener,
-		MediaPlayer.OnCompletionListener{
+		MediaPlayer.OnCompletionListener, SeekBar.OnSeekBarChangeListener{
 	private MediaPlayer player;
-	private ArrayList<Song> songs;
+	private ArrayList<Song> songs, prev;
 	private int songPos;
 	private final IBinder musicBind = new MusicBinder();
+    private boolean paused = true;
+    private int pausePosition;
 
-	public MusicService() {
+    public MusicService() {
 
     }
 
@@ -30,6 +36,7 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
 		songPos = 0;
 		player = new MediaPlayer();
 		init();
+        prev = new ArrayList<Song>();
 	}
 
 	public void init(){
@@ -43,6 +50,14 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
 	public void setList(ArrayList<Song> songs){
 		this.songs = songs;
 	}
+
+    public void pauseSong(ImageButton arg1){
+        arg1.setImageResource(R.drawable.ic_play_button);
+        pausePosition = player.getCurrentPosition();
+        player.pause();
+        paused = true;
+        
+    }
 
 	public void playSong(){
 		player.reset();
@@ -75,7 +90,13 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
 
 	@Override
 	public void onCompletion(MediaPlayer mediaPlayer) {
+        prev.add(songs.get(0));
+        songs.remove(0);
+        if(songPos != songs.size()) {
 
+            playSong();
+            HostFragment.adapter.notifyDataSetChanged();
+        }
 	}
 
 	@Override
@@ -88,7 +109,71 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
 		mediaPlayer.start();
 	}
 
-	public class MusicBinder extends Binder {
+    public void handleCallback(ImageButton arg1) {
+        if(!player.isPlaying()){
+            arg1.setImageResource(R.drawable.ic_pause);
+            playSong();
+        }
+    }
+
+    public void nextSong() {
+        prev.add(songs.get(0));
+        songs.remove(0);
+        if(songPos != songs.size()) {
+
+            playSong();
+            HostFragment.adapter.notifyDataSetChanged();
+        }
+
+    }
+
+    public void prevSong(){
+        songs.add(0, prev.get(prev.size() - 1));
+        prev.remove(prev.size() - 1);
+        if(songPos != songs.size()) {
+
+            playSong();
+            HostFragment.adapter.notifyDataSetChanged();
+        }
+        playSong();
+        HostFragment.adapter.notifyDataSetChanged();
+
+    }
+
+    public void playBtn(ImageButton arg1){
+        arg1.setImageResource(R.drawable.ic_pause);
+        if(paused){
+            player.start();
+            player.seekTo(pausePosition);
+        } else {
+            if (HostFragment.adapter != null && HostFragment.adapter.getCount() > 0) {
+                playSong();
+            } else {
+                Toast.makeText(getApplicationContext(), "Please beam a song first", Toast.LENGTH_LONG);
+            }
+        }
+    }
+
+    public int getSong(){
+        return songPos;
+    }
+
+    @Override
+    public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+
+    }
+
+    @Override
+    public void onStartTrackingTouch(SeekBar seekBar) {
+
+    }
+
+    @Override
+    public void onStopTrackingTouch(SeekBar seekBar) {
+
+    }
+
+    public class MusicBinder extends Binder {
 		MusicService getService(){
 			return MusicService.this;
 		}

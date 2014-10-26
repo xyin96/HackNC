@@ -16,7 +16,7 @@ import android.widget.ListView;
 
 import java.util.ArrayList;
 
-public class MainFragment extends Fragment {
+public class MainFragment extends Fragment implements View.OnClickListener{
 
     public MainFragment() {
 
@@ -30,29 +30,8 @@ public class MainFragment extends Fragment {
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		View view = inflater.inflate(R.layout.fragment_main, container, false);
-		ArrayList<String> data = new ArrayList<String>();
-		data.add("Host");
-		data.add("Add Song");
-		ListView list = (ListView) view.findViewById(R.id.mainList);
-		list.setAdapter(new CardAdapter(data, getActivity()));
-		list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-			@Override
-			public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-				FragmentManager fm = getFragmentManager();
-				switch(i){
-					case 0:
-						fm.beginTransaction().replace(R.id.container, new HostFragment())
-								.addToBackStack(null).commit();
-						break;
-					case 1:
-                        Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
-                        intent.addCategory(Intent.CATEGORY_OPENABLE);
-                        intent.setType("*/*");//audio/*");
-                        startActivityForResult(intent, 1);
-						break;
-				}
-			}
-		});
+        view.findViewById(R.id.hostButton).setOnClickListener(this);
+        view.findViewById(R.id.selectButton).setOnClickListener(this);
 
 		return view;
 	}
@@ -62,12 +41,13 @@ public class MainFragment extends Fragment {
         if (resultCode == Activity.RESULT_OK) {
             Uri file = data.getData();
             Uri[] mFileUris = new Uri[1];
+
             Log.i("hello", file.toString());
             mFileUris[0] = file;
             NfcAdapter nfcAdapter = NfcAdapter.getDefaultAdapter(getActivity());
             nfcAdapter.setBeamPushUris(mFileUris,getActivity());
             FragmentManager fm = getFragmentManager();
-            fm.beginTransaction().replace(R.id.container, new ClientFragment())
+            fm.beginTransaction().replace(R.id.container, ClientFragment.newInstance(mFileUris[0]))
                     .addToBackStack(null).commit();
         }
     }
@@ -82,4 +62,20 @@ public class MainFragment extends Fragment {
 		super.onDetach();
 	}
 
+    @Override
+    public void onClick(View view) {
+        FragmentManager fm = getFragmentManager();
+        switch(view.getId()){
+            case R.id.hostButton:
+                fm.beginTransaction().replace(R.id.container, new HostFragment())
+                        .addToBackStack(null).commit();
+                break;
+            case R.id.selectButton:
+                Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+                intent.addCategory(Intent.CATEGORY_OPENABLE);
+                intent.setType("audio/*");//audio/*");
+                startActivityForResult(intent, 1);
+                break;
+        }
+    }
 }

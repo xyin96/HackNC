@@ -5,6 +5,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -39,7 +40,7 @@ public class CardAdapter extends BaseAdapter {
 		if (vi == null)
 			vi = inflater.inflate(R.layout.card_button, null);
 
-		TextView text = (TextView) vi.findViewById(R.id.cardText);
+		TextView text = (TextView) vi.findViewById(R.id.cardText_title);
 		text.setText(data.get(position).toString());
 
 		vi.setTag(position);

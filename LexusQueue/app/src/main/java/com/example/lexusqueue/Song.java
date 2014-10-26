@@ -1,14 +1,18 @@
 package com.example.lexusqueue;
 
+import android.graphics.Bitmap;
+
 public class Song {
 	private long id;
 	private String title;
 	private String artist;
+    private Bitmap bm;
 
-	public Song(long id, String title, String artist){
+	public Song(long id, String title, String artist, Bitmap bm){
 		this.id = id;
 		this.title = title;
 		this.artist = artist;
+        this.bm = bm;
 	}
 
 	public long getID(){
@@ -26,4 +30,8 @@ public class Song {
 	public String toString(){
 		return title + " - " + getArtist();
 	}
+
+    public Bitmap getBm() {
+        return bm;
+    }
 }
