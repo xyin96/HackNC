@@ -96,7 +96,10 @@ public class HostFragment extends Fragment implements View.OnClickListener{
                 }
                 ((TextView)v.findViewById(R.id.cardText_artist)).setText(songs.get(position).getArtist());
                 ((TextView)v.findViewById(R.id.cardText_title)).setText(songs.get(position).getTitle());
-                ((ImageView)v.findViewById(R.id.album_art_imageview)).setImageBitmap(songs.get(position).getBm());
+                Bitmap bm = songs.get(position).getBm();
+                if(bm != null) {
+                    ((ImageView) v.findViewById(R.id.album_art_imageview)).setImageBitmap(songs.get(position).getBm());
+                }
                 return v;
             }
         };
@@ -260,7 +263,12 @@ public class HostFragment extends Fragment implements View.OnClickListener{
                     String artist = cursor.getString(artistColumn);
                     MediaMetadataRetriever m = new MediaMetadataRetriever();
                     m.setDataSource(getActivity(), fUri[0]);
-                    Bitmap bm = BitmapFactory.decodeByteArray(m.getEmbeddedPicture(), 0, m.getEmbeddedPicture().length);
+                    Bitmap bm = null;
+                    try {
+                        bm = BitmapFactory.decodeByteArray(m.getEmbeddedPicture(), 0, m.getEmbeddedPicture().length);
+                    } catch( Exception e ){
+
+                    }
                     songs.add(new Song(id, title, artist, bm));
                 } while (cursor.moveToNext());
             }

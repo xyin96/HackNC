@@ -13,11 +13,13 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/hostButton"
+        android:background="@drawable/selectable_card"
         android:text="Host"/>
     <Button
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/selectButton"
+        android:background="@drawable/selectable_card"
         android:text="Select Song"/>
 
 </LinearLayout>

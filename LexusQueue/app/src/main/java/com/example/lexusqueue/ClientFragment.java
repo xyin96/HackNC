@@ -3,10 +3,12 @@ package com.example.lexusqueue;
 import android.app.Activity;
 import android.app.Fragment;
 import android.database.Cursor;
+import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.MediaMetadataRetriever;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -36,7 +38,17 @@ public class ClientFragment extends Fragment {
         MediaMetadataRetriever m = new MediaMetadataRetriever();
         m.setDataSource(getActivity(), uri);
 
-        ((ImageView)view.findViewById(R.id.album_art_imageview)).setImageBitmap(BitmapFactory.decodeByteArray(m.getEmbeddedPicture(),0,m.getEmbeddedPicture().length));
+
+
+        Bitmap bm = null;
+        try {
+            bm = BitmapFactory.decodeByteArray(m.getEmbeddedPicture(), 0, m.getEmbeddedPicture().length);
+            if (bm != null) {
+                ((ImageView) view.findViewById(R.id.album_art_imageview)).setImageBitmap(bm);
+            }
+        } catch( Exception e ){
+
+        }
         ((TextView)view.findViewById(R.id.client_title)).setText(m.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE));
         ((TextView)view.findViewById(R.id.client_artist)).setText(m.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ARTIST));
 
