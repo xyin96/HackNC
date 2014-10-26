@@ -1,6 +1,7 @@
 package com.example.lexusqueue;
 
 import android.app.Activity;
+import android.app.FragmentManager;
 import android.app.PendingIntent;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -13,7 +14,6 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
@@ -32,6 +32,11 @@ public class main extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+		FragmentManager fm = getFragmentManager();
+		fm.beginTransaction().replace(R.id.container, new HostFragment()).commit();
+
+
+/*
         mTextView = (TextView) findViewById(R.id.textView_explanation);
 
         mNfcAdapter = NfcAdapter.getDefaultAdapter(this);
@@ -51,6 +56,7 @@ public class main extends Activity {
         }
 
         handleIntent(getIntent());
+        */
     }
 
     @Override
@@ -61,7 +67,7 @@ public class main extends Activity {
          * It's important, that the activity is in the foreground (resumed). Otherwise
          * an IllegalStateException is thrown.
          */
-        setupForegroundDispatch(this, mNfcAdapter);
+        //setupForegroundDispatch(this, mNfcAdapter);
     }
 
     @Override
@@ -69,7 +75,7 @@ public class main extends Activity {
         /**
          * Call this before onPause, otherwise an IllegalArgumentException is thrown as well.
          */
-        stopForegroundDispatch(this, mNfcAdapter);
+        //stopForegroundDispatch(this, mNfcAdapter);
 
         super.onPause();
     }
