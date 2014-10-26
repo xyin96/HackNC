@@ -1,4 +1,4 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/container"
     android:layout_width="match_parent"
@@ -10,4 +10,16 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/explanation" />
-    </FrameLayout>
+    <Button
+        android:id="@+id/pickFile"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="pick"
+        android:layout_below="@+id/textView_explanation"></Button>
+    <Button
+        android:id="@+id/sendBeam"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Beam"
+        android:layout_below="@+id/pickFile"></Button>
+    </RelativeLayout>
