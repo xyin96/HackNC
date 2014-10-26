@@ -5,15 +5,41 @@
     android:layout_height="match_parent"
     tools:context="com.example.lexusqueue.HostFragment">
 
-    <ListView
-        android:id="@android:id/list"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent">
 
-    <TextView
-        android:id="@android:id/empty"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:gravity="center" />
+        <ListView
+            android:id="@android:id/list"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent">
+
+            <ImageButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_launcher"
+                android:id="@+id/backButton" />
+
+            <ImageButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="New Button"
+                android:id="@+id/playButton" />
+
+            <ImageButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="New Button"
+                android:id="@+id/nextButton"
+                android:clickable="false" />
+        </LinearLayout>
+
+    </LinearLayout>
 
 </FrameLayout>
