@@ -1,20 +1,18 @@
 package com.example.lexusqueue;
 
-import android.net.Uri;
-
 public class Song {
-	private Uri uri;
+	private long id;
 	private String title;
 	private String artist;
 
-	public Song(Uri uri, String title, String artist){
-		this.uri = uri;
+	public Song(long id, String title, String artist){
+		this.id = id;
 		this.title = title;
 		this.artist = artist;
 	}
 
-	public Uri getUri(){
-		return uri;
+	public long getID(){
+		return id;
 	}
 
 	public String getTitle(){
@@ -26,6 +24,6 @@ public class Song {
 	}
 
 	public String toString(){
-		return title + " - " + artist;
+		return title + " - " + getArtist();
 	}
 }

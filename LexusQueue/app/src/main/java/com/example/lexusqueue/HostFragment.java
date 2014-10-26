@@ -2,37 +2,80 @@ package com.example.lexusqueue;
 
 import android.app.Activity;
 import android.app.Fragment;
+import android.content.ComponentName;
+import android.content.Context;
+import android.content.Intent;
+import android.content.ServiceConnection;
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
+import android.os.FileObserver;
+import android.os.Handler;
+import android.os.IBinder;
+import android.os.Looper;
+import android.provider.MediaStore;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ImageButton;
 import android.widget.ListView;
 
+import java.io.File;
 import java.util.ArrayList;
 
 public class HostFragment extends Fragment {
+	private Intent playIntent;
+	private boolean musicBound = false;
+	private CardAdapter adapter;
+	private ArrayList<Song> songs;
+	private MusicService musicSrv;
 
-    public HostFragment() {
+	public HostFragment() {
 
     }
 
-    @Override
+	@Override
+	public void onStart() {
+		super.onStart();
+		if(playIntent == null){
+			Context context = getActivity();
+			playIntent = new Intent(context, MusicService.class);
+			context.bindService(playIntent, musicConnection, Context.BIND_AUTO_CREATE);
+			context.startService(playIntent);
+		}
+	}
+
+	@Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+		PathFileObserver myFileObserver = new PathFileObserver(Environment.getExternalStorageDirectory().toString()+"/beam/");
+		myFileObserver.startWatching();
+		Log.d("test", myFileObserver.toString());
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		View view = inflater.inflate(R.layout.fragment_host_list, container, false);
 
-		ArrayList<Song> songs = new ArrayList<Song>();
+		songs = new ArrayList<Song>();
 		ListView list = (ListView) view.findViewById(R.id.list);
 		ImageButton play = (ImageButton) view.findViewById(R.id.playButton);
 		ImageButton back = (ImageButton) view.findViewById(R.id.backButton);
 		ImageButton next = (ImageButton) view.findViewById(R.id.nextButton);
 
-		list.setAdapter(new CardAdapter(songs, getActivity()));
+		adapter = new CardAdapter(songs, getActivity());
+		list.setAdapter(adapter);
+
+		list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+			@Override
+			public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+				musicSrv.setSong(i);
+				musicSrv.playSong();
+			}
+		});
 
 		play.setOnClickListener(new View.OnClickListener() {
 			@Override
@@ -57,7 +100,6 @@ public class HostFragment extends Fragment {
         return view;
     }
 
-
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
@@ -68,4 +110,91 @@ public class HostFragment extends Fragment {
 		super.onDetach();
     }
 
+	@Override
+	public void onDestroy() {
+		getActivity().stopService(playIntent);
+		musicSrv = null;
+		super.onDestroy();
+	}
+
+
+	private ServiceConnection musicConnection = new ServiceConnection() {
+		@Override
+		public void onServiceConnected(ComponentName name, IBinder service) {
+			MusicService.MusicBinder binder = (MusicService.MusicBinder) service;
+			musicSrv = binder.getService();
+			musicSrv.setList(songs);
+			musicBound = true;
+		}
+
+		@Override
+		public void onServiceDisconnected(ComponentName componentName) {
+			musicBound = false;
+		}
+	};
+
+	public class PathFileObserver extends FileObserver{
+		static final String TAG="FILEOBSERVER";
+		/**
+		 * should be end with File.separator
+		 */
+		String rootPath;
+		static final int mask = FileObserver.MOVED_TO;
+
+		String file;
+		public PathFileObserver(String root){
+			super(root, mask);
+			file = root;
+			/*
+			if (! root.endsWith(File.separator)){
+				root += File.separator;
+			}
+			*/
+			rootPath = root;
+		}
+
+		public void onEvent(int event, String path) {
+			switch(event){
+				case FileObserver.MOVED_TO:
+					File f = new File(file+path);
+					if(!f.toString().substring(f.toString().length()-4).equals(".mp3"))
+						f.renameTo(new File(file+path+".mp3"));
+					Log.d("test", "@" + f);
+					Uri uri = MediaStore.Audio.Media.getContentUriForPath(f.toString());
+					uri = Uri.fromFile(f);
+					Log.d("test", "#" + uri.toString());
+					Cursor cursor = getActivity().getContentResolver()
+							.query(uri, null, null, null, null, null);
+					Log.d("test", "!" + cursor.toString());
+					if(cursor.moveToFirst()){
+						int titleColumn = cursor.getColumnIndex
+								(android.provider.MediaStore.Audio.Media.TITLE);
+						int idColumn = cursor.getColumnIndex
+								(android.provider.MediaStore.Audio.Media._ID);
+						int artistColumn = cursor.getColumnIndex
+								(android.provider.MediaStore.Audio.Media.ARTIST);
+						do {
+							long id = cursor.getLong(idColumn);
+							String title = cursor.getString(titleColumn);
+							String artist = cursor.getString(artistColumn);
+							songs.add(new Song(id, title, artist));
+						} while (cursor.moveToNext());
+					}
+					Handler mainHandler = new Handler(Looper.getMainLooper());
+					Runnable myRunnable = new Runnable() {
+						@Override
+						public void run() {
+							adapter.notifyDataSetChanged();
+
+						}
+					};
+					mainHandler.post(myRunnable);
+					break;
+							}
+		}
+
+		public void close(){
+			super.finalize();
+		}
+	}
 }

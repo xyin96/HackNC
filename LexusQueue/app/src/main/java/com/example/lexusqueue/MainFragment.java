@@ -47,9 +47,8 @@ public class MainFragment extends Fragment {
 					case 1:
                         Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
                         intent.addCategory(Intent.CATEGORY_OPENABLE);
-                        intent.setType("audio/mpeg");
-                        Intent intent2 = Intent.createChooser(intent, "File");
-                        startActivityForResult(intent2, 1);
+                        intent.setType("*/*");//audio/*");
+                        startActivityForResult(intent, 1);
 						break;
 				}
 			}
